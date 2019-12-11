@@ -1,0 +1,70 @@
+Resources:
+  EC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow all to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c682ed16-5123-401a-b4a8-277e081765bd
+  Ec2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.large
+      KeyName : jenkinsci
+      ImageId: ami-00c32260f3e0f401c
+      UserData:
+        'Fn::Base64': !Sub |
+          #!/bin/bash
+          yum -y update
+
+          # install apache
+          yum install httpd24 -y  
+
+          # start server
+          service httpd start
+          chkconfig httpd on
+      SecurityGroups:
+        - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: My EC2 Instance
+        - Key: Type
+          Value: Worker Instance
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d05dc7a4-6bf6-4cd3-9e44-3607732b052c
+Metadata:
+  'AWS::CloudFormation::Designer':
+    c682ed16-5123-401a-b4a8-277e081765bd:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 60
+        'y': 90
+      z: 1
+      embeds: []
+    d05dc7a4-6bf6-4cd3-9e44-3607732b052c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 180
+        'y': 90
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - c682ed16-5123-401a-b4a8-277e081765bd
